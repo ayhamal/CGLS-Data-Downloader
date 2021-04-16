@@ -5,29 +5,45 @@
 # conda install -c conda-forge r-ncdf4
 # conda install -c conda-forge r-raster
 
+import os
 import rpy2.robjects as robjects
 
+# Import r object
 r = robjects.r
 
+# Register R source scripts
 r['source']('Copernicus-Global-Land-Service-Data-Download-with-R/land.CopernicusDataDownload.R')
-r['source']('Copernicus-Global-Land-Service-Data-Download-with-R/HelloWorld.R')
 
-# function(path, username, password, timeframe, product, resolution, version)
+# Importing R functions as Python functions
 downloadCGLSData = robjects.globalenv['download.CGLS.data']
-# function(path, date, product, resolution, version)
 ncOpenCGLSData = robjects.globalenv['nc_open.CGLS.data']
-# function(path, date, product, resolution, version, variable)
 ncvarGetCGSLData = robjects.globalenv['ncvar_get_CGSL.data']
-# function(path, timeframe, product, resolution, version, variable)
 stackCGLSData = robjects.globalenv['stack.CGLS.data']
 
-downloadCGLSData('E:\Projects\Python\CGLS Data Downloader\Downloads', 'Yttrium', 'Guillermo123', '2021-04-05', 'swi', "1km", "v1")
-ncOpenCGLSData('E:\Projects\Python\CGLS Data Downloader\Downloads', '2021-04-05', 'swi', '1km', 'v1')
-# ncvarGetCGSLData(path, date, product, resolution, version, variable)
-# stackCGLSData(path, timeframe, product, resolution, version, variable)
+# - Description of Variables:
+#
+# downloadsPath : TARGET DIRECTORY, default: ./Downloads
+# userName : USERNAME
+# password : PASSWORD
+# timeFrame : TIMEFRAME OF INTEREST, for example June 2019
+# product : PRODUCT VARIABLE; CHOSE FROM fapar, fcover, lai, ndvi, ssm, swi, lst...
+# resolution : RESOLTION; CHOSE FROM  1km, 300m or 100m
+# version : VERSION; CHOSE FROM "v1", "v2", "v3"...
 
-r_getname = robjects.globalenv['SayHello']
+downloadsPath = os.getcwd()+'\\Downloads'
+userName = 'Yttrium'
+password = 'Guillermo123'
+timeFrame = '2021-04-05'
+specificDate = '2021-04-05'
+product = 'swi'
+resolution = '1km'
+version = 'v1'
+variable = ''
 
-r_getname()
+if not os.path.exists(downloadsPath):
+    os.makedirs(downloadsPath)
 
-print("ok")
+downloadCGLSData(downloadsPath, userName, password, timeFrame, product, resolution, version)
+ncOpenCGLSData(downloadsPath, specificDate, product, resolution, version)
+ncvarGetCGSLData(downloadsPath, specificDate, product, resolution, version, variable)
+stackCGLSData(downloadsPath, timeFrame, product, resolution, version, variable)
